@@ -1,0 +1,111 @@
+{{form_open('customers/save/'~person_info.person_id,{'id':'customer_form'})}}
+<div id="required_fields_message">{{line('common_fields_required_message')}}</div>
+<ul id="error_message_box"></ul>
+<fieldset id="customer_basic_info" class="col-md-6">
+    <legend>{{line("customers_basic_information")}}</legend>
+    {%include 'people/form_basic_info.html.twig'%}
+</fieldset>
+
+<fieldset id="consumo_info" class="col-md-6">
+    <div class="field_row clearfix">	
+        {{form_label(line('customers_tipo_cuenta')~':', 'account_number')}}
+        <div class='form_field'>
+            {{ form_dropdown('tipo_consumo',tipo_consumo,person_info.id_tipo_consumo,{'class':'form-control'})}}
+        </div>
+    </div>
+    <div class="field_row clearfix">	
+        {{form_label(line('customers_account_number')~':', 'account_number')}}
+        <div class='form_field'>
+            {{ form_input({'name':'account_number', 'id':'account_number', 'value':person_info.account_number,'class':'form-control'})}}
+        </div>
+    </div>
+    <div class="field_row clearfix">	
+        {{form_label(line('customers_registro_inicial')~" ("~line('customers_registro_inicial_inicia')~")"~':', 'registro_inicial')}}
+        <div class='form_field'>
+            {{ form_input({'name':'registro_inicial', 'id':'registro_inicial', 'value':person_info.registro_inicial,'class':'form-control'})}}
+        </div>
+    </div>
+    <div class="field_row clearfix">	
+        {{form_label(line('customers_fecha_ingreso')~':', 'fecha_ingreso')}}
+        <div class='form_field'>
+            {{ form_input({'name':'fecha_ingreso', 'id':'fecha_ingreso', 'value':person_info.fecha_ingreso,'class':'form-control date-picker'})}}
+        </div>
+    </div>
+
+    {#<div class="field_row clearfix">	
+        {{ form_label(line('customers_taxable')~':', 'taxable')}}
+        <div class='form_field'>
+            {{form_checkbox('taxable', '1', person_info.taxable == '' ? 'true' : person_info.taxable)}}
+        </div>
+    </div>#}
+    <br>
+    {{ form_submit({'name':'submit', 'id':'submit', 'value':line('common_submit'), 'class':'btn btn-success btn-block'})}}
+</fieldset>
+{{form_close()}}
+{% block javascript %}
+    <script type='text/javascript'>
+
+        //validation and submit handling
+        $(document).ready(function ()
+        {
+            $('.date-picker').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'yy-mm-dd'
+            });
+            $('#customer_form').validate({
+                submitHandler: function (form)
+                {
+
+
+                    $.ajax({
+                        type: $(form).attr('method'),
+                        url: $(form).attr('action'),
+                        data: $(form).serialize(),
+                        success: function (response)
+                        {
+                            tb_remove();
+                            post_person_form_submit(response);
+                            console.log(response);
+                        },
+                        dataType: 'json'
+                    });
+
+
+
+                    /*$('#customer_form').submit(function (event) {
+                     $.ajax({
+                     type: 'POST',
+                     url:  $('#customer_form').attr( "action" ),
+                     data:  $( this ).serialize(), 
+                     dataType: 'json', 
+                     encode: true
+                     })
+                     .done(function (data) {
+                     tb_remove();
+                     post_person_form_submit(data);
+                     console.log(data);
+                     
+                     });
+                     });*/
+
+                },
+                errorLabelContainer: "#error_message_box",
+                wrapper: "li",
+                rules:
+                        {
+                            first_name: "required",
+                            last_name: "required",
+                            email: "email"
+                        },
+                messages:
+                        {
+                            first_name: "{{line('common_first_name_required')}}",
+                            last_name: "{{line('common_last_name_required')}}",
+                            email: "{{line('common_email_invalid_format')}}"
+                        }
+            });
+        });
+    </script>
+{% endblock %}

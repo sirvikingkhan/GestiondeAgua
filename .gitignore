@@ -1,0 +1,7 @@
+application/config/database.php
+.htaccess
+application/logs/*
+/nbproject/private/
+/assets/bower_components/
+/node_modules/
+sess/*
